@@ -6,11 +6,19 @@ namespace App\Service\PaymentEventProcessor\EventProcessor;
 
 use App\Service\PaymentEventProcessor\PaymentEventInterface;
 use App\Service\PaymentEventProcessor\PaymentEventType;
+use App\Service\Subscription\SubscriptionRenewer;
 use App\Traits\LoggerRequiredTrait;
 
 class RenewedSubscriptionEventProcessor implements EventProcessorInterface
 {
     use LoggerRequiredTrait;
+
+    private SubscriptionRenewer $subscriptionRenewer;
+
+    public function __construct(SubscriptionRenewer $subscriptionRenewer)
+    {
+        $this->subscriptionRenewer = $subscriptionRenewer;
+    }
 
     public function support(PaymentEventInterface $event): bool
     {
@@ -19,9 +27,6 @@ class RenewedSubscriptionEventProcessor implements EventProcessorInterface
 
     public function process(PaymentEventInterface $event): void
     {
-        $this->logger->info(
-            sprintf('Event "%s" received', $event->getPaymentEventType()->getValue()),
-            ['subscriptionId' => $event->getSubscriptionId()]
-        );
+        $this->subscriptionRenewer->renew($event->getSubscription());
     }
 }

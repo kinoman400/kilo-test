@@ -4,15 +4,17 @@ declare(strict_types=1);
 
 namespace App\Service\PaymentEventProcessor;
 
+use App\Entity\Subscription;
+
 class PaymentEvent implements PaymentEventInterface
 {
     private PaymentEventType $type;
-    private string $subscriptionId;
+    private Subscription $subscription;
 
-    public function __construct(PaymentEventType $type, string $subscriptionId)
+    public function __construct(PaymentEventType $type, Subscription $subscription)
     {
         $this->type = $type;
-        $this->subscriptionId = $subscriptionId;
+        $this->subscription = $subscription;
     }
 
     public function getPaymentEventType(): PaymentEventType
@@ -20,8 +22,8 @@ class PaymentEvent implements PaymentEventInterface
         return $this->type;
     }
 
-    public function getSubscriptionId(): string
+    public function getSubscription(): Subscription
     {
-        return $this->subscriptionId;
+        return $this->subscription;
     }
 }

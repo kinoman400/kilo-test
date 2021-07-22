@@ -6,11 +6,19 @@ namespace App\Service\PaymentEventProcessor\EventProcessor;
 
 use App\Service\PaymentEventProcessor\PaymentEventInterface;
 use App\Service\PaymentEventProcessor\PaymentEventType;
+use App\Service\Subscription\SubscriptionStarter;
 use App\Traits\LoggerRequiredTrait;
 
 class InitialSubscriptionEventProcessor implements EventProcessorInterface
 {
     use LoggerRequiredTrait;
+
+    private SubscriptionStarter $subscriptionStarter;
+
+    public function __construct(SubscriptionStarter $subscriptionStarter)
+    {
+        $this->subscriptionStarter = $subscriptionStarter;
+    }
 
     public function support(PaymentEventInterface $event): bool
     {
@@ -19,9 +27,6 @@ class InitialSubscriptionEventProcessor implements EventProcessorInterface
 
     public function process(PaymentEventInterface $event): void
     {
-        $this->logger->info(
-            sprintf('Event "%s" received', $event->getPaymentEventType()->getValue()),
-            ['subscriptionId' => $event->getSubscriptionId()]
-        );
+        $this->subscriptionStarter->start($event->getSubscription());
     }
 }

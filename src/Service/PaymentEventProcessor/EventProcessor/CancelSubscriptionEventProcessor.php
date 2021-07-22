@@ -6,11 +6,19 @@ namespace App\Service\PaymentEventProcessor\EventProcessor;
 
 use App\Service\PaymentEventProcessor\PaymentEventInterface;
 use App\Service\PaymentEventProcessor\PaymentEventType;
+use App\Service\Subscription\SubscriptionCanceler;
 use App\Traits\LoggerRequiredTrait;
 
 class CancelSubscriptionEventProcessor implements EventProcessorInterface
 {
     use LoggerRequiredTrait;
+
+    private SubscriptionCanceler $subscriptionCanceler;
+
+    public function __construct(SubscriptionCanceler $subscriptionCanceler)
+    {
+        $this->subscriptionCanceler = $subscriptionCanceler;
+    }
 
     public function support(PaymentEventInterface $event): bool
     {
@@ -19,9 +27,6 @@ class CancelSubscriptionEventProcessor implements EventProcessorInterface
 
     public function process(PaymentEventInterface $event): void
     {
-        $this->logger->info(
-            sprintf('Event "%s" received', $event->getPaymentEventType()->getValue()),
-            ['subscriptionId' => $event->getSubscriptionId()]
-        );
+        $this->subscriptionCanceler->cancel($event->getSubscription());
     }
 }

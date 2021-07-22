@@ -2,7 +2,7 @@
 
 #### Development installation
 
-Copy .env to .env.local and update it
+Copy .env to .env.local and configure it
 ``
 cp .env .env.local
 ``
@@ -10,6 +10,11 @@ cp .env .env.local
 Run composer install
 ``
 $ composer install
+``
+
+Run migrations
+``
+$ bin/console doctrine:migrations:migrate
 ``
 
 Start Symfony server https://symfony.com/doc/current/setup/symfony_server.html
