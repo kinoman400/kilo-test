@@ -13,8 +13,10 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Serializer\SerializerInterface;
+use Throwable;
 
 class AppleWebhookController extends AbstractController
 {
@@ -30,7 +32,13 @@ class AppleWebhookController extends AbstractController
         PaymentEventProcessor $processor,
         ApplePaymentEventBuilder $eventBuilder
     ): Response {
-        $data = $serializer->decode($request->getContent(), 'json');
+        try {
+            $data = $serializer->decode($request->getContent(), 'json');
+        } catch (Throwable $e) {
+            $this->logger->info('Invalid event data received', ['request' => $request]);
+            throw new BadRequestHttpException('Invalid request');
+        }
+
         $this->logger->info('Apple event data received', $data);
 
         $event = new AppleEvent($data);
